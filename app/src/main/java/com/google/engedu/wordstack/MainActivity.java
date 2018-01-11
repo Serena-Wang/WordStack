@@ -15,6 +15,7 @@
 
 package com.google.engedu.wordstack;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,7 @@ import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private StackedLayout stackedLayout;
     private String word1, word2;
     private final String TAG="a";
+    private Stack<LetterTile> placedTiles = new Stack<LetterTile>();
+    private Button undo;
 
 
     @Override
@@ -72,17 +76,26 @@ public class MainActivity extends AppCompatActivity {
         verticalLayout.addView(stackedLayout, 3);
 
         View word1LinearLayout = findViewById(R.id.word1);
-        word1LinearLayout.setOnTouchListener(new TouchListener());
-        //word1LinearLayout.setOnDragListener(new DragListener());
+        //word1LinearLayout.setOnTouchListener(new TouchListener());
+        word1LinearLayout.setOnDragListener(new DragListener());
         View word2LinearLayout = findViewById(R.id.word2);
-        word2LinearLayout.setOnTouchListener(new TouchListener());
-        //word2LinearLayout.setOnDragListener(new DragListener());
+       // word2LinearLayout.setOnTouchListener(new TouchListener());
+        word2LinearLayout.setOnDragListener(new DragListener());
+        /*undo = (Button) findViewById(R.id.button);
+        undo.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Log.d(TAG,"click undo");
+                onUndo(view);
+            }
+        });*/
     }
 
     private class TouchListener implements View.OnTouchListener {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            Log.d(TAG,"in onTouch");
             if (event.getAction() == MotionEvent.ACTION_DOWN && !stackedLayout.empty()) {
                 LetterTile tile = (LetterTile) stackedLayout.peek();
                 tile.moveToViewGroup((ViewGroup) v);
@@ -90,13 +103,13 @@ public class MainActivity extends AppCompatActivity {
                     TextView messageBox = (TextView) findViewById(R.id.message_box);
                     messageBox.setText(word1 + " " + word2);
                 }
-                /**
-                 **
-                 **  YOUR CODE GOES HERE
-                 **
-                 **/
+                //placedTiles.push(tile);
+                //Log.d(TAG,"pushed to placedTiles");
+                //return tile.onTouchEvent(event);
                 return true;
             }
+
+
             return false;
         }
     }
@@ -130,11 +143,12 @@ public class MainActivity extends AppCompatActivity {
                         TextView messageBox = (TextView) findViewById(R.id.message_box);
                         messageBox.setText(word1 + " " + word2);
                     }
-                    /**
-                     **
-                     **  YOUR CODE GOES HERE
-                     **
-                     **/
+                    LinearLayout parent = (LinearLayout) tile.getParent();
+                    LinearLayout newParent = (LinearLayout) v;
+                    parent.removeView(tile);
+                    newParent.addView(tile);
+                    placedTiles.push(tile);
+                    Log.d(TAG,"pushed to placedTiles");
                     return true;
             }
             return false;
@@ -179,22 +193,23 @@ public class MainActivity extends AppCompatActivity {
 
 
         Log.d(TAG,"scrambled: "+scrambled);
-        messageBox.setText(scrambled);
-        /*char[] scrambledArray = scrambled.toCharArray();
+        //messageBox.setText(scrambled);
+        char[] scrambledArray = scrambled.toCharArray();
+        Context context = getApplicationContext();
         for (int i=scrambledArray.length-1;i>=0;i--){
-
-        }*/
-
+           stackedLayout.push(new LetterTile(context, scrambledArray[i]));
+        }
 
         return true;
     }
 
     public boolean onUndo(View view) {
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
+        Log.d(TAG,"in onUndo");
+        if (!placedTiles.isEmpty()) {
+            LetterTile recent = placedTiles.pop();
+            recent.moveToViewGroup(stackedLayout);
+            Log.d(TAG,"move to view group");
+        }
         return true;
     }
 }
