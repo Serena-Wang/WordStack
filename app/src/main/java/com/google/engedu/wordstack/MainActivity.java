@@ -15,6 +15,7 @@
 
 package com.google.engedu.wordstack;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -171,19 +172,17 @@ public class MainActivity extends AppCompatActivity {
                     counter2++;
                 }
             }
-
-
             pickWord = random.nextInt(2);
-
         }
 
 
         Log.d(TAG,"scrambled: "+scrambled);
         messageBox.setText(scrambled);
-        /*char[] scrambledArray = scrambled.toCharArray();
+        char[] scrambledArray = scrambled.toCharArray();
+        Context context = getApplicationContext();
         for (int i=scrambledArray.length-1;i>=0;i--){
-
-        }*/
+            stackedLayout.push(new LetterTile(context, scrambledArray[i]));
+        }
 
 
         return true;
