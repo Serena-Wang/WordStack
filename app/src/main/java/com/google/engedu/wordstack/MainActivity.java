@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG="a";
     private Stack<LetterTile> placedTiles = new Stack<LetterTile>();
     //private Button undo;
+    //testing
 
 
     @Override
