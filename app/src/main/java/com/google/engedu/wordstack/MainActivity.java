@@ -47,11 +47,14 @@ public class MainActivity extends AppCompatActivity {
     private StackedLayout stackedLayout;
     private String word1, word2;
     private final String TAG="a";
+    private Stack<LetterTile> placedTiles;
+    private boolean pressedOnce = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        placedTiles = new Stack<LetterTile>();
         setContentView(R.layout.activity_main);
         AssetManager assetManager = getAssets();
         try {
@@ -74,10 +77,10 @@ public class MainActivity extends AppCompatActivity {
 
         View word1LinearLayout = findViewById(R.id.word1);
         word1LinearLayout.setOnTouchListener(new TouchListener());
-        //word1LinearLayout.setOnDragListener(new DragListener());
+        word1LinearLayout.setOnDragListener(new DragListener());
         View word2LinearLayout = findViewById(R.id.word2);
         word2LinearLayout.setOnTouchListener(new TouchListener());
-        //word2LinearLayout.setOnDragListener(new DragListener());
+        word2LinearLayout.setOnDragListener(new DragListener());
     }
 
     private class TouchListener implements View.OnTouchListener {
@@ -131,11 +134,11 @@ public class MainActivity extends AppCompatActivity {
                         TextView messageBox = (TextView) findViewById(R.id.message_box);
                         messageBox.setText(word1 + " " + word2);
                     }
-                    /**
-                     **
-                     **  YOUR CODE GOES HERE
-                     **
-                     **/
+                    LinearLayout parent = (LinearLayout) tile.getParent();
+                    LinearLayout newParent = (LinearLayout) v;
+                    parent.removeView(tile);
+                    newParent.addView(tile);
+                    placedTiles.push(tile);
                     return true;
             }
             return false;
@@ -143,57 +146,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean onStartGame(View view) {
+        if(pressedOnce==true) {
+            LinearLayout wordOne = (LinearLayout) findViewById(R.id.word1);
+            wordOne.removeAllViews();
+            LinearLayout wordTwo = (LinearLayout) findViewById(R.id.word2);
+            wordTwo.removeAllViews();
+            stackedLayout.clear();
+        }
         TextView messageBox = (TextView) findViewById(R.id.message_box);
         messageBox.setText("Game started");
         word1 = words.get(random.nextInt(words.size()));
         word2 = words.get(random.nextInt(words.size()));
-        Log.d(TAG,"word1: "+word1);
-        Log.d(TAG,"word2: "+word2);
+        Log.d("TAG", "word1: " + word1);
+        Log.d("TAG", "word2: " + word2);
         char[] word1Array = word1.toCharArray();
         char[] word2Array = word2.toCharArray();
         int counter1 = 0;
         int counter2=0;
         int pickWord = random.nextInt(2);
         String scrambled="";
-        Log.d(TAG,"scrambled: "+scrambled);
         while (counter1<word1Array.length ||counter2<word2Array.length){
-            Log.d(TAG,"pickWord: "+pickWord);
             if (pickWord==0){
                 if (counter1<word1Array.length){
-                    Log.d(TAG,"counter1: "+counter1);
                     scrambled += word1Array[counter1];
                     counter1++;
                 }
 
             } else {
                if (counter2<word2Array.length) {
-                    Log.d(TAG,"counter2: "+counter2);
                     scrambled += word2Array[counter2];
                     counter2++;
                 }
             }
             pickWord = random.nextInt(2);
         }
-
-
-        Log.d(TAG,"scrambled: "+scrambled);
         messageBox.setText(scrambled);
         char[] scrambledArray = scrambled.toCharArray();
         Context context = getApplicationContext();
         for (int i=scrambledArray.length-1;i>=0;i--){
             stackedLayout.push(new LetterTile(context, scrambledArray[i]));
         }
-
-
+        pressedOnce=true;
         return true;
     }
 
     public boolean onUndo(View view) {
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
+        if(!placedTiles.isEmpty()){
+            LetterTile recent = placedTiles.pop();
+            recent.moveToViewGroup(stackedLayout);
+        }
         return true;
     }
 }

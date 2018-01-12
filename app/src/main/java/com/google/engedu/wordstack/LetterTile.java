@@ -15,6 +15,7 @@
 
 package com.google.engedu.wordstack;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Color;
@@ -25,6 +26,7 @@ import android.view.ViewParent;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+@SuppressLint("AppCompatCustomView")
 public class LetterTile extends TextView {
 
     public static final int TILE_SIZE = 150;
@@ -39,7 +41,7 @@ public class LetterTile extends TextView {
         setHeight(TILE_SIZE);
         setWidth(TILE_SIZE);
         setTextSize(30);
-        setBackgroundColor(Color.rgb(255, 255, 200));
+        setBackgroundColor(Color.rgb(0,0,0));
     }
 
     public void moveToViewGroup(ViewGroup targetView) {
@@ -68,11 +70,12 @@ public class LetterTile extends TextView {
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
+        if(!frozen){
+            if(motionEvent.getAction()==MotionEvent.ACTION_DOWN){
+                startDrag(ClipData.newPlainText("", ""), new View.DragShadowBuilder(this), this, 0);
+                return true;
+            }
+        }
         return super.onTouchEvent(motionEvent);
     }
 }
