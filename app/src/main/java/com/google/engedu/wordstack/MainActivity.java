@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private String word1, word2;
     private final String TAG="a";
     private Stack<LetterTile> placedTiles = new Stack<LetterTile>();
-    private Button undo;
+    //private Button undo;
 
 
     @Override
